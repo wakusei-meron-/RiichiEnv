@@ -510,6 +510,19 @@ mod tests {
     }
 
     #[test]
+    fn logical_meld_counts_zero_through_four_are_accepted_when_consistent() {
+        for meld_count in 0..=4 {
+            let concealed = 13 - meld_count * 3;
+            let mut counts = vec![0; TILE_KIND_COUNT];
+            for index in 0..concealed as usize {
+                counts[index] = 1;
+            }
+            let input = CalculationInput { variant: Variant::Yonma, counts34: counts.clone(), unavailable_counts34: counts, meld_count, contract_version: CALCULATION_CONTRACT_VERSION.to_owned() };
+            assert!(calculate_shanten34(&input).is_ok());
+        }
+    }
+
+    #[test]
     fn fixed_seed_one_million_valid_states_preserve_tile_invariants() {
         let mut seed = 0x4d30_7631_u64;
         for _ in 0..1_000_000 {
