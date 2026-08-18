@@ -46,17 +46,18 @@ jobs:
 
       - name: Build installable browser and Node WASM packages
         run: |
-          wasm-pack build riichienv-calc-wasm --target web --out-dir ../dist/riichienv-calc-wasm-web
-          wasm-pack build riichienv-calc-wasm --target nodejs --out-dir ../dist/riichienv-calc-wasm-node
-          cd dist/riichienv-calc-wasm-web
+          wasm-pack build riichienv-calc-wasm --target web --out-dir ../target/calc-release-web
+          wasm-pack build riichienv-calc-wasm --target nodejs --out-dir ../target/calc-release-node
+          cd target/calc-release-web
           npm pkg set name=@wakusei-meron/riichi-calc-web
-          npm pack --pack-destination ..
-          cd ../riichienv-calc-wasm-node
+          npm pack --pack-destination ../../dist
+          cd ../calc-release-node
           npm pkg set name=@wakusei-meron/riichi-calc-node
-          npm pack --pack-destination ..
+          npm pack --pack-destination ../../dist
           cd ../..
-          npm install --no-save ./dist/wakusei-meron-riichi-calc-node-*.tgz
-          node tests/wasm/calc_m0_node.mjs node_modules/@wakusei-meron/riichi-calc-node
+          mkdir -p target/calc-release-install
+          npm install --prefix target/calc-release-install --no-save ./dist/wakusei-meron-riichi-calc-node-*.tgz
+          node tests/wasm/calc_m0_node.mjs target/calc-release-install/node_modules/@wakusei-meron/riichi-calc-node
 
       - name: Build provenance manifest
         run: |
