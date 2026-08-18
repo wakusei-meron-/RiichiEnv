@@ -1,8 +1,15 @@
 import json
+from pathlib import Path
 
 import pytest
 
-from riichienv import CalcError, analyze_draws34, calculate_shanten34
+from riichienv import (
+    CalcError,
+    analyze_discards34,
+    analyze_draws34,
+    calculate_batch34,
+    calculate_shanten34,
+)
 
 
 def _tenpai_input() -> tuple[list[int], list[int]]:
@@ -56,3 +63,70 @@ def test_m0_python_range_errors_are_typed_before_internal_conversion(
         calculate_shanten34(counts, meld_count, unavailable, "yonma", "m0-v1")
 
     assert raised.value.code == expected_code
+
+
+def test_m0_python_executes_canonical_scalar_fixture() -> None:
+    fixture = json.loads((Path(__file__).parents[1] / "fixtures/calc-m0-v1.json").read_text())
+    functions = {
+        "calculate_shanten34": calculate_shanten34,
+        "analyze_draws34": analyze_draws34,
+        "analyze_discards34": analyze_discards34,
+    }
+    for case in fixture["cases"]:
+        input_ = case["input"]
+        arguments = (
+            input_["counts34"],
+            input_["meld_count"],
+            input_["unavailable_counts34"],
+            input_["variant"],
+            input_["contract_version"],
+        )
+        expected_error = case.get("expect_error")
+        if expected_error:
+            with pytest.raises(CalcError) as raised:
+                functions[case["operation"]](*arguments)
+            assert raised.value.code == expected_error, case["name"]
+            continue
+        result = json.loads(functions[case["operation"]](*arguments))
+        _assert_partial_expectations(case["name"], result, case.get("expect", {}))
+
+
+def _assert_partial_expectations(name: str, result: object, expected: dict[str, object]) -> None:
+    assert isinstance(result, dict) or isinstance(result, list), name
+    if not isinstance(result, dict):
+        return
+    for field, expected_value in expected.items():
+        if field == "minimum_shanten":
+            actual = result.get("shanten", result).get("minimum")
+        elif field in {"improving_tiles34", "agari_tiles34"}:
+            actual = [tile["tile34"] for tile in result[field.removesuffix("34")]]
+        else:
+            actual = result.get(field)
+        assert actual == expected_value, f"{name}: {field}"
+
+
+def test_m0_python_batch_preserves_order_and_exposes_item_error_code() -> None:
+    counts, unavailable = _tenpai_input()
+    input_ = {
+        "variant": "yonma",
+        "counts34": counts,
+        "meld_count": 0,
+        "unavailable_counts34": unavailable,
+        "contract_version": "m0-v1",
+    }
+    requests = [
+        {"id": "ok", "operation": "analyze_draws34", "input": input_},
+        {
+            "id": "bad",
+            "operation": "analyze_draws34",
+            "input": {**input_, "counts34": []},
+        },
+    ]
+    result = json.loads(calculate_batch34(json.dumps(requests)))
+    assert [item["id"] for item in result] == ["ok", "bad"]
+    assert result[0]["result"]["kind"] == "draws"
+    assert result[1]["error"]["code"] == "HAND_MELD_INCONSISTENT"
+
+    with pytest.raises(CalcError) as raised:
+        calculate_batch34(json.dumps([requests[0], requests[0]]))
+    assert raised.value.code == "DUPLICATE_BATCH_ID"

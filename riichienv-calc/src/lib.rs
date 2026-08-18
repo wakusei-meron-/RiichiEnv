@@ -354,7 +354,24 @@ pub enum CalculationResult {
 pub struct BatchItemResult {
     pub id: String,
     pub result: Option<CalculationResult>,
-    pub error: Option<CalcError>,
+    pub error: Option<CalcErrorPayload>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CalcErrorPayload {
+    pub code: String,
+    pub message: String,
+    pub details: CalcError,
+}
+
+impl From<CalcError> for CalcErrorPayload {
+    fn from(error: CalcError) -> Self {
+        Self {
+            code: error.code().to_owned(),
+            message: error.to_string(),
+            details: error,
+        }
+    }
 }
 
 /// Execute scalar-equivalent work in input order.  Duplicate identifiers and
@@ -403,7 +420,7 @@ pub fn calculate_batch34(requests: &[BatchRequest]) -> Result<Vec<BatchItemResul
                 Err(error) => BatchItemResult {
                     id: request.id.clone(),
                     result: None,
-                    error: Some(error),
+                    error: Some(error.into()),
                 },
             }
         })

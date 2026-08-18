@@ -33,7 +33,9 @@ fn parse_input(value: JsValue) -> Result<CalculationInput, JsValue> {
 }
 
 fn serialize<T: serde::Serialize>(value: T) -> Result<JsValue, JsValue> {
-    serde_wasm_bindgen::to_value(&value).map_err(serialization_error)
+    value
+        .serialize(&serde_wasm_bindgen::Serializer::json_compatible())
+        .map_err(serialization_error)
 }
 
 /// Works with both wasm-pack `--target web` and `--target nodejs`; initialization

@@ -4,33 +4,61 @@
   "availability_contract_version": "unavailable-physical-v1",
   "notes": [
     "counts34 has 34 base-tile entries; red fives are normalized by adapters before this fixture.",
-    "unavailable_counts34 includes every physically unavailable tile exactly once, including concealed hand, rivers, melds, and revealed dora indicators.",
-    "KAN_DORA_EVENT_BOUNDARY_UNAVAILABLE and unknown meld encodings are adapter errors, not calculation-core inputs."
-    ,"chi, pon, daiminkan, ankan, kakan and pre/post-rinshan are adapter fixtures: this core receives only their logical meld_count and never infers a meld kind."
+    "unavailable_counts34 includes concealed tiles, rivers, melds, and revealed dora indicators exactly once per physical tile.",
+    "Chi, pon, daiminkan, ankan, kakan, rinshan, and kan-dora event boundaries belong to adapter fixtures; the core receives only meld_count and projected availability."
   ],
   "cases": [
     {
       "name": "closed_tenpai_agari_is_also_improving",
       "operation": "analyze_draws34",
-      "input": {"variant": "yonma", "counts34": [1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0], "meld_count": 0, "unavailable_counts34": [1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0], "contract_version": "m0-v1"},
-      "expect": {"minimum_shanten": 0, "agari_tiles34": [11], "agari_tile_count": 4}
+      "input": {"variant":"yonma","counts34":[1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0],"meld_count":0,"unavailable_counts34":[1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0],"contract_version":"m0-v1"},
+      "expect": {"minimum_shanten":0,"improving_tiles34":[11],"agari_tiles34":[11],"agari_tile_count":4}
+    },
+    {
+      "name": "availability_overlap_changes_remaining_not_shape",
+      "operation": "analyze_draws34",
+      "input": {"variant":"yonma","counts34":[1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0],"meld_count":0,"unavailable_counts34":[4,1,1,1,1,1,1,1,1,1,1,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0],"contract_version":"m0-v1"},
+      "expect": {"minimum_shanten":0,"agari_tiles34":[11],"agari_tile_count":2}
+    },
+    {
+      "name": "exhausted_agari_tile_is_not_returned",
+      "operation": "analyze_draws34",
+      "input": {"variant":"yonma","counts34":[1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0],"meld_count":0,"unavailable_counts34":[1,1,1,1,1,1,1,1,1,1,1,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0],"contract_version":"m0-v1"},
+      "expect": {"minimum_shanten":0,"improving_tiles34":[],"agari_tiles34":[],"agari_tile_count":0}
+    },
+    {
+      "name": "closed_chiitoitsu_tenpai",
+      "operation": "calculate_shanten34",
+      "input": {"variant":"yonma","counts34":[2,2,2,2,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"meld_count":0,"unavailable_counts34":[2,2,2,2,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"contract_version":"m0-v1"},
+      "expect": {"minimum_shanten":0,"chiitoitsu":0}
+    },
+    {
+      "name": "closed_kokushi_tenpai",
+      "operation": "calculate_shanten34",
+      "input": {"variant":"yonma","counts34":[1,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1],"meld_count":0,"unavailable_counts34":[1,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1],"contract_version":"m0-v1"},
+      "expect": {"minimum_shanten":0,"kokushi":0}
     },
     {
       "name": "open_hand_disables_chiitoitsu_and_kokushi",
       "operation": "calculate_shanten34",
-      "input": {"variant": "yonma", "counts34": [1,1,1,1,1,1,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0], "meld_count": 1, "unavailable_counts34": [1,1,1,1,1,1,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0], "contract_version": "m0-v1"},
-      "expect": {"chiitoitsu": null, "kokushi": null}
+      "input": {"variant":"yonma","counts34":[1,1,1,1,1,1,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0],"meld_count":1,"unavailable_counts34":[1,1,1,1,1,1,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0],"contract_version":"m0-v1"},
+      "expect": {"chiitoitsu":null,"kokushi":null}
     },
+    {"name":"meld_count_2","operation":"calculate_shanten34","input":{"variant":"yonma","counts34":[1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"meld_count":2,"unavailable_counts34":[1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"contract_version":"m0-v1"}},
+    {"name":"meld_count_3","operation":"calculate_shanten34","input":{"variant":"yonma","counts34":[1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"meld_count":3,"unavailable_counts34":[1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"contract_version":"m0-v1"}},
+    {"name":"meld_count_4","operation":"calculate_shanten34","input":{"variant":"yonma","counts34":[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"meld_count":4,"unavailable_counts34":[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"contract_version":"m0-v1"}},
     {
       "name": "discard_keeps_unavailable_counts_constant",
       "operation": "analyze_discards34",
-      "input": {"variant": "yonma", "counts34": [1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1,0,0,0,0,0], "meld_count": 0, "unavailable_counts34": [1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1,0,0,0,0,0], "contract_version": "m0-v1"}
+      "input": {"variant":"yonma","counts34":[1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1,0,0,0,0,0],"meld_count":0,"unavailable_counts34":[1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1,0,0,0,0,0],"contract_version":"m0-v1"}
     },
-    {"name": "unsupported_sanma", "operation": "calculate_shanten34", "input": {"variant": "sanma", "counts34": [], "meld_count": 0, "unavailable_counts34": [], "contract_version": "m0-v1"}, "expect_error": "UNSUPPORTED_VARIANT"},
-    {"name": "contract_mismatch", "operation": "calculate_shanten34", "input": {"variant": "yonma", "counts34": [], "meld_count": 0, "unavailable_counts34": [], "contract_version": "m0-v0"}, "expect_error": "CONTRACT_VERSION_MISMATCH"},
-    {"name": "count_out_of_range", "operation": "calculate_shanten34", "input": {"variant": "yonma", "counts34": [5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], "meld_count": 4, "unavailable_counts34": [5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], "contract_version": "m0-v1"}, "expect_error": "COUNT_OUT_OF_RANGE"},
-    {"name": "unavailable_below_hand", "operation": "calculate_shanten34", "input": {"variant": "yonma", "counts34": [1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0], "meld_count": 0, "unavailable_counts34": [0,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0], "contract_version": "m0-v1"}, "expect_error": "UNAVAILABLE_BELOW_HAND"}
-    ,{"name":"meld_count_out_of_range","operation":"calculate_shanten34","input":{"variant":"yonma","counts34":[],"meld_count":5,"unavailable_counts34":[],"contract_version":"m0-v1"},"expect_error":"MELD_COUNT_OUT_OF_RANGE"}
-    ,{"name":"hand_meld_inconsistent","operation":"analyze_draws34","input":{"variant":"yonma","counts34":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"meld_count":0,"unavailable_counts34":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"contract_version":"m0-v1"},"expect_error":"HAND_MELD_INCONSISTENT"}
+    {"name":"unsupported_sanma","operation":"calculate_shanten34","input":{"variant":"sanma","counts34":[],"meld_count":0,"unavailable_counts34":[],"contract_version":"m0-v1"},"expect_error":"UNSUPPORTED_VARIANT"},
+    {"name":"contract_mismatch","operation":"calculate_shanten34","input":{"variant":"yonma","counts34":[],"meld_count":0,"unavailable_counts34":[],"contract_version":"m0-v0"},"expect_error":"CONTRACT_VERSION_MISMATCH"},
+    {"name":"count_out_of_range","operation":"calculate_shanten34","input":{"variant":"yonma","counts34":[5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"meld_count":4,"unavailable_counts34":[5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"contract_version":"m0-v1"},"expect_error":"COUNT_OUT_OF_RANGE"},
+    {"name":"negative_count_out_of_range","operation":"calculate_shanten34","input":{"variant":"yonma","counts34":[-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"meld_count":4,"unavailable_counts34":[-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"contract_version":"m0-v1"},"expect_error":"COUNT_OUT_OF_RANGE"},
+    {"name":"unavailable_below_hand","operation":"calculate_shanten34","input":{"variant":"yonma","counts34":[1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0],"meld_count":0,"unavailable_counts34":[0,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0],"contract_version":"m0-v1"},"expect_error":"UNAVAILABLE_BELOW_HAND"},
+    {"name":"meld_count_out_of_range","operation":"calculate_shanten34","input":{"variant":"yonma","counts34":[],"meld_count":5,"unavailable_counts34":[],"contract_version":"m0-v1"},"expect_error":"MELD_COUNT_OUT_OF_RANGE"},
+    {"name":"negative_meld_count_out_of_range","operation":"calculate_shanten34","input":{"variant":"yonma","counts34":[],"meld_count":-1,"unavailable_counts34":[],"contract_version":"m0-v1"},"expect_error":"MELD_COUNT_OUT_OF_RANGE"},
+    {"name":"hand_meld_inconsistent","operation":"analyze_draws34","input":{"variant":"yonma","counts34":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"meld_count":0,"unavailable_counts34":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"contract_version":"m0-v1"},"expect_error":"HAND_MELD_INCONSISTENT"}
   ]
 }
