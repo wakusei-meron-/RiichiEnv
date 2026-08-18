@@ -33,3 +33,26 @@ def test_m0_python_error_exposes_machine_readable_code() -> None:
 
     assert raised.value.code == "UNAVAILABLE_BELOW_HAND"
     assert "UNAVAILABLE_BELOW_HAND" in raised.value.details
+
+
+@pytest.mark.parametrize(
+    ("counts_value", "meld_count", "expected_code"),
+    [
+        (-1, 0, "COUNT_OUT_OF_RANGE"),
+        (256, 0, "COUNT_OUT_OF_RANGE"),
+        (0, -1, "MELD_COUNT_OUT_OF_RANGE"),
+        (0, 256, "MELD_COUNT_OUT_OF_RANGE"),
+    ],
+)
+def test_m0_python_range_errors_are_typed_before_internal_conversion(
+    counts_value: int, meld_count: int, expected_code: str
+) -> None:
+    counts, unavailable = _tenpai_input()
+    if counts_value:
+        counts[0] = counts_value
+        unavailable[0] = counts_value
+
+    with pytest.raises(CalcError) as raised:
+        calculate_shanten34(counts, meld_count, unavailable, "yonma", "m0-v1")
+
+    assert raised.value.code == expected_code

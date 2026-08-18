@@ -69,9 +69,9 @@ fn py_calc_error(error: riichienv_calc::CalcError) -> PyErr {
 }
 
 fn calc_input(
-    counts34: Vec<u8>,
-    meld_count: u8,
-    unavailable_counts34: Vec<u8>,
+    counts34: Vec<i64>,
+    meld_count: i64,
+    unavailable_counts34: Vec<i64>,
     variant: &str,
     contract_version: String,
 ) -> PyResult<riichienv_calc::CalculationInput> {
@@ -105,9 +105,9 @@ fn calc_json<T: serde::Serialize>(
 #[pyfunction]
 #[pyo3(signature = (counts34, meld_count, unavailable_counts34, variant, contract_version))]
 fn calculate_shanten34(
-    counts34: Vec<u8>,
-    meld_count: u8,
-    unavailable_counts34: Vec<u8>,
+    counts34: Vec<i64>,
+    meld_count: i64,
+    unavailable_counts34: Vec<i64>,
     variant: &str,
     contract_version: String,
 ) -> PyResult<String> {
@@ -123,9 +123,9 @@ fn calculate_shanten34(
 #[pyfunction]
 #[pyo3(signature = (counts34, meld_count, unavailable_counts34, variant, contract_version))]
 fn analyze_draws34(
-    counts34: Vec<u8>,
-    meld_count: u8,
-    unavailable_counts34: Vec<u8>,
+    counts34: Vec<i64>,
+    meld_count: i64,
+    unavailable_counts34: Vec<i64>,
     variant: &str,
     contract_version: String,
 ) -> PyResult<String> {
@@ -141,9 +141,9 @@ fn analyze_draws34(
 #[pyfunction]
 #[pyo3(signature = (counts34, meld_count, unavailable_counts34, variant, contract_version))]
 fn analyze_discards34(
-    counts34: Vec<u8>,
-    meld_count: u8,
-    unavailable_counts34: Vec<u8>,
+    counts34: Vec<i64>,
+    meld_count: i64,
+    unavailable_counts34: Vec<i64>,
     variant: &str,
     contract_version: String,
 ) -> PyResult<String> {

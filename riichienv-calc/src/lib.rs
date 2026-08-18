@@ -40,9 +40,9 @@ pub enum Variant {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct CalculationInput {
     pub variant: Variant,
-    pub counts34: Vec<u8>,
-    pub meld_count: u8,
-    pub unavailable_counts34: Vec<u8>,
+    pub counts34: Vec<i64>,
+    pub meld_count: i64,
+    pub unavailable_counts34: Vec<i64>,
     pub contract_version: String,
 }
 
@@ -74,20 +74,20 @@ pub enum CalcError {
     CountOutOfRange {
         field: String,
         index: usize,
-        value: u8,
+        value: i64,
     },
     #[error(
         "UNAVAILABLE_BELOW_HAND: unavailable_counts34[{index}] ({unavailable}) is below counts34 ({hand})"
     )]
     UnavailableBelowHand {
         index: usize,
-        unavailable: u8,
-        hand: u8,
+        unavailable: i64,
+        hand: i64,
     },
     #[error("HAND_MELD_INCONSISTENT: expected {expected} logical tiles, got {actual}")]
     HandMeldInconsistent { expected: u8, actual: u8 },
     #[error("MELD_COUNT_OUT_OF_RANGE: meld_count must be between 0 and 4, got {meld_count}")]
-    MeldCountOutOfRange { meld_count: u8 },
+    MeldCountOutOfRange { meld_count: i64 },
     #[error("UNSUPPORTED_VARIANT: only yonma is supported by calculation contract m0-v1")]
     UnsupportedVariant,
     #[error("CONTRACT_VERSION_MISMATCH: expected {expected}, got {actual}")]
@@ -161,7 +161,7 @@ fn validate(
             actual: input.contract_version.clone(),
         });
     }
-    if input.meld_count > 4 {
+    if !(0..=4).contains(&input.meld_count) {
         return Err(CalcError::MeldCountOutOfRange {
             meld_count: input.meld_count,
         });
@@ -182,14 +182,14 @@ fn validate(
     }
     let mut result = [0; TILE_KIND_COUNT];
     for index in 0..TILE_KIND_COUNT {
-        if counts[index] > 4 {
+        if !(0..=4).contains(&counts[index]) {
             return Err(CalcError::CountOutOfRange {
                 field: "counts34".to_owned(),
                 index,
                 value: counts[index],
             });
         }
-        if unavailable[index] > 4 {
+        if !(0..=4).contains(&unavailable[index]) {
             return Err(CalcError::CountOutOfRange {
                 field: "unavailable_counts34".to_owned(),
                 index,
@@ -203,9 +203,9 @@ fn validate(
                 hand: counts[index],
             });
         }
-        result[index] = counts[index];
+        result[index] = counts[index] as u8;
     }
-    let total = result.iter().sum::<u8>() + input.meld_count * 3;
+    let total = result.iter().sum::<u8>() + input.meld_count as u8 * 3;
     if let Some(expected) = expected_total {
         if total != expected {
             return Err(CalcError::HandMeldInconsistent {
@@ -250,24 +250,24 @@ fn shanten_from_counts(counts: &[u8; TILE_KIND_COUNT], meld_count: u8) -> Shante
 /// Calculate all four-player shanten forms for a validated 13- or 14-tile state.
 pub fn calculate_shanten34(input: &CalculationInput) -> Result<ShantenResult, CalcError> {
     let counts = validate(input, None)?;
-    Ok(shanten_from_counts(&counts, input.meld_count))
+    Ok(shanten_from_counts(&counts, input.meld_count as u8))
 }
 
 fn analyze_draws_validated(
     input: &CalculationInput,
     counts: &[u8; TILE_KIND_COUNT],
 ) -> DrawAnalysis {
-    let shanten = shanten_from_counts(counts, input.meld_count);
+    let shanten = shanten_from_counts(counts, input.meld_count as u8);
     let mut improving_tiles = Vec::new();
     let mut agari_tiles = Vec::new();
     for index in 0..TILE_KIND_COUNT {
-        let remaining_count = 4 - input.unavailable_counts34[index];
+        let remaining_count = (4 - input.unavailable_counts34[index]) as u8;
         if remaining_count == 0 {
             continue;
         }
         let mut next_counts = *counts;
         next_counts[index] += 1;
-        let next_shanten = shanten_from_counts(&next_counts, input.meld_count).minimum;
+        let next_shanten = shanten_from_counts(&next_counts, input.meld_count as u8).minimum;
         let analysis = TileAnalysis {
             tile34: index as u8,
             remaining_count,
@@ -423,7 +423,7 @@ mod tests {
             variant: Variant::Yonma,
             unavailable_counts34: counts34.clone(),
             counts34,
-            meld_count,
+            meld_count: i64::from(meld_count),
             contract_version: CALCULATION_CONTRACT_VERSION.to_owned(),
         }
     }
@@ -461,6 +461,20 @@ mod tests {
         assert!(matches!(
             analyze_draws34(&state),
             Err(CalcError::CountOutOfRange { .. })
+        ));
+
+        let mut negative_count = input(&[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 27, 27], 0);
+        negative_count.counts34[0] = -1;
+        assert!(matches!(
+            analyze_draws34(&negative_count),
+            Err(CalcError::CountOutOfRange { value: -1, .. })
+        ));
+
+        let mut negative_meld = input(&[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 27, 27], 0);
+        negative_meld.meld_count = -1;
+        assert!(matches!(
+            analyze_draws34(&negative_meld),
+            Err(CalcError::MeldCountOutOfRange { meld_count: -1 })
         ));
     }
 
@@ -514,10 +528,16 @@ mod tests {
         for meld_count in 0..=4 {
             let concealed = 13 - meld_count * 3;
             let mut counts = vec![0; TILE_KIND_COUNT];
-            for index in 0..concealed as usize {
-                counts[index] = 1;
+            for count in counts.iter_mut().take(concealed as usize) {
+                *count = 1;
             }
-            let input = CalculationInput { variant: Variant::Yonma, counts34: counts.clone(), unavailable_counts34: counts, meld_count, contract_version: CALCULATION_CONTRACT_VERSION.to_owned() };
+            let input = CalculationInput {
+                variant: Variant::Yonma,
+                counts34: counts.clone(),
+                unavailable_counts34: counts,
+                meld_count,
+                contract_version: CALCULATION_CONTRACT_VERSION.to_owned(),
+            };
             assert!(calculate_shanten34(&input).is_ok());
         }
     }
@@ -526,7 +546,7 @@ mod tests {
     fn fixed_seed_one_million_valid_states_preserve_tile_invariants() {
         let mut seed = 0x4d30_7631_u64;
         for _ in 0..1_000_000 {
-            let mut counts34 = vec![0u8; TILE_KIND_COUNT];
+            let mut counts34 = vec![0i64; TILE_KIND_COUNT];
             let mut placed = 0;
             while placed < 13 {
                 seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1);

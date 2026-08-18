@@ -17,3 +17,14 @@ try {
 } catch (error) {
   assert.equal(error.code, "CONTRACT_VERSION_MISMATCH");
 }
+for (const [patch, code] of [
+  [{ counts34: [-1, ...counts34.slice(1)], unavailable_counts34: [-1, ...counts34.slice(1)] }, "COUNT_OUT_OF_RANGE"],
+  [{ meld_count: -1 }, "MELD_COUNT_OUT_OF_RANGE"],
+]) {
+  try {
+    wasm.calculate_shanten34({ ...input, ...patch });
+    assert.fail(`expected ${code}`);
+  } catch (error) {
+    assert.equal(error.code, code);
+  }
+}
