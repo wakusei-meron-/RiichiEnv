@@ -169,8 +169,12 @@ jobs:
 
       - name: Build strict calculation WASM for browser and Node
         run: |
-          wasm-pack build riichienv-calc-wasm --target web
-          wasm-pack build riichienv-calc-wasm --target nodejs
+          wasm-pack build riichienv-calc-wasm --target web --out-dir ../target/calc-m0-web
+          wasm-pack build riichienv-calc-wasm --target nodejs --out-dir ../target/calc-m0-node
+          node tests/wasm/calc_m0_node.mjs target/calc-m0-node
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+          node tests/wasm/calc_m0_browser.mjs target/calc-m0-web
 
       - name: Install Node.js
         uses: actions/setup-node@v4

@@ -48,9 +48,12 @@ jobs:
         run: |
           wasm-pack build riichienv-calc-wasm --target web --out-dir ../dist/riichienv-calc-wasm-web
           wasm-pack build riichienv-calc-wasm --target nodejs --out-dir ../dist/riichienv-calc-wasm-node
-          tar -C dist -czf dist/riichienv-calc-wasm-web.tar.gz riichienv-calc-wasm-web
-          tar -C dist -czf dist/riichienv-calc-wasm-node.tar.gz riichienv-calc-wasm-node
-          rm -rf dist/riichienv-calc-wasm-web dist/riichienv-calc-wasm-node
+          npm pkg set name=@wakusei-meron/riichi-calc-web --prefix dist/riichienv-calc-wasm-web
+          npm pkg set name=@wakusei-meron/riichi-calc-node --prefix dist/riichienv-calc-wasm-node
+          npm pack --pack-destination dist --prefix dist/riichienv-calc-wasm-web
+          npm pack --pack-destination dist --prefix dist/riichienv-calc-wasm-node
+          npm install --no-save ./dist/wakusei-meron-riichi-calc-node-*.tgz
+          node tests/wasm/calc_m0_node.mjs node_modules/@wakusei-meron/riichi-calc-node
 
       - name: Build provenance manifest
         run: |
