@@ -508,4 +508,32 @@ mod tests {
         let json = r#"{"variant":"yonma","counts34":[],"meld_count":0,"unavailable_counts34":[]}"#;
         assert!(serde_json::from_str::<CalculationInput>(json).is_err());
     }
+
+    #[test]
+    fn fixed_seed_one_million_valid_states_preserve_tile_invariants() {
+        let mut seed = 0x4d30_7631_u64;
+        for _ in 0..1_000_000 {
+            let mut counts34 = vec![0u8; TILE_KIND_COUNT];
+            let mut placed = 0;
+            while placed < 13 {
+                seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1);
+                let tile = ((seed >> 32) % TILE_KIND_COUNT as u64) as usize;
+                if counts34[tile] < 4 {
+                    counts34[tile] += 1;
+                    placed += 1;
+                }
+            }
+            let input = CalculationInput {
+                variant: Variant::Yonma,
+                unavailable_counts34: counts34.clone(),
+                counts34,
+                meld_count: 0,
+                contract_version: CALCULATION_CONTRACT_VERSION.to_owned(),
+            };
+            let result = calculate_shanten34(&input).unwrap();
+            assert!(result.minimum <= result.standard);
+            assert!(result.chiitoitsu.is_some());
+            assert!(result.kokushi.is_some());
+        }
+    }
 }
