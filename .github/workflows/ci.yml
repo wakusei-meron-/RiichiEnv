@@ -161,6 +161,11 @@ jobs:
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
       - name: Install wasm-pack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 
@@ -175,11 +180,6 @@ jobs:
           npm install --no-save playwright
           npx playwright install --with-deps chromium
           node tests/wasm/calc_m0_browser.mjs target/calc-m0-web
-
-      - name: Install Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
 
       - name: Build UI
         run: |

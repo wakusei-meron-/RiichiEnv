@@ -44,7 +44,7 @@ jobs:
           tar -tzf dist/*.tar.gz | grep -q 'riichienv-calc/SOURCE_GIT_SHA'
           tar -xOf dist/*.tar.gz --wildcards '*/riichienv-calc/SOURCE_GIT_SHA' | grep -Fx "${GITHUB_SHA}"
 
-      - name: Build browser and Node WASM tarballs
+      - name: Build installable browser and Node WASM packages
         run: |
           wasm-pack build riichienv-calc-wasm --target web --out-dir ../dist/riichienv-calc-wasm-web
           wasm-pack build riichienv-calc-wasm --target nodejs --out-dir ../dist/riichienv-calc-wasm-node
