@@ -64,6 +64,9 @@ jobs:
       - name: Rust Cargo Test (pure core)
         run: cargo test -p riichienv-core
 
+      - name: Rust Cargo Test (strict calculation core)
+        run: cargo test -p riichienv-calc --all-features
+
       - name: Rust Cargo Test (all features)
         run: cargo test --all-targets --all-features
 
@@ -101,6 +104,9 @@ jobs:
 
       - name: Rust Cargo Check (wasm target)
         run: cargo check -p riichienv-wasm --target wasm32-unknown-unknown
+
+      - name: Rust Cargo Check (strict calculation WASM target)
+        run: cargo check -p riichienv-calc-wasm --target wasm32-unknown-unknown
 
       - name: Install dependencies
         run: uv sync --all-extras --dev
@@ -160,6 +166,11 @@ jobs:
 
       - name: Build WASM
         run: wasm-pack build riichienv-wasm --target web
+
+      - name: Build strict calculation WASM for browser and Node
+        run: |
+          wasm-pack build riichienv-calc-wasm --target web
+          wasm-pack build riichienv-calc-wasm --target nodejs
 
       - name: Install Node.js
         uses: actions/setup-node@v4

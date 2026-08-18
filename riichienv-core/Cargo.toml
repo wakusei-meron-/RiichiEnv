@@ -12,6 +12,7 @@ categories = ["game-engines", "simulation"]
 crate-type = ["rlib"]
 
 [dependencies]
+riichienv-calc = { path = "../riichienv-calc" }
 pyo3 = { version = "0.28", optional = true }
 thiserror = "2.0"
 derive_more = { version = "2.0", features = ["deref", "deref_mut", "into"] }
@@ -33,5 +34,5 @@ harness = false
 
 [features]
 default = ["dep:flate2"]
-python = ["dep:pyo3", "dep:flate2"]
+python = ["dep:pyo3", "dep:flate2", "riichienv-calc/legacy-python"]
 wasm = []

@@ -1,6 +1,6 @@
 [project]
-name = "riichienv"
-version = "0.4.8"
+name = "mj-riichienv"
+version = "0.1.0"
 authors = [
     { name="Kohei Ozaki", email="19337+smly@users.noreply.github.com" },
 ]
@@ -20,8 +20,8 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/smly/RiichiEnv"
-Issues = "https://github.com/smly/RiichiEnv/issues"
+Homepage = "https://github.com/wakusei-meron-/RiichiEnv"
+Issues = "https://github.com/wakusei-meron-/RiichiEnv/issues"
 
 [build-system]
 requires = ["maturin>=1.9.4,<2.0"]
@@ -31,7 +31,7 @@ build-backend = "maturin"
 python-source = "src"
 manifest-path = "riichienv-python/Cargo.toml"
 module-name = "riichienv._riichienv"
-include = ["src/riichienv/visualizer/assets/**"]
+include = ["src/riichienv/visualizer/assets/**", "riichienv-calc/SOURCE_GIT_SHA"]
 
 [dependency-groups]
 dev = [

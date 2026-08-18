@@ -1,3 +1,9 @@
 [workspace]
 resolver = "2"
-members = ["riichienv-core", "riichienv-python", "riichienv-wasm"]
+members = [
+    "riichienv-core",
+    "riichienv-calc",
+    "riichienv-python",
+    "riichienv-wasm",
+    "riichienv-calc-wasm",
+]
