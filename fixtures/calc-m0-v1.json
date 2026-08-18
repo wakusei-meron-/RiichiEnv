@@ -6,6 +6,7 @@
     "counts34 has 34 base-tile entries; red fives are normalized by adapters before this fixture.",
     "unavailable_counts34 includes every physically unavailable tile exactly once, including concealed hand, rivers, melds, and revealed dora indicators.",
     "KAN_DORA_EVENT_BOUNDARY_UNAVAILABLE and unknown meld encodings are adapter errors, not calculation-core inputs."
+    ,"chi, pon, daiminkan, ankan, kakan and pre/post-rinshan are adapter fixtures: this core receives only their logical meld_count and never infers a meld kind."
   ],
   "cases": [
     {
@@ -29,5 +30,7 @@
     {"name": "contract_mismatch", "operation": "calculate_shanten34", "input": {"variant": "yonma", "counts34": [], "meld_count": 0, "unavailable_counts34": [], "contract_version": "m0-v0"}, "expect_error": "CONTRACT_VERSION_MISMATCH"},
     {"name": "count_out_of_range", "operation": "calculate_shanten34", "input": {"variant": "yonma", "counts34": [5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], "meld_count": 4, "unavailable_counts34": [5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], "contract_version": "m0-v1"}, "expect_error": "COUNT_OUT_OF_RANGE"},
     {"name": "unavailable_below_hand", "operation": "calculate_shanten34", "input": {"variant": "yonma", "counts34": [1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0], "meld_count": 0, "unavailable_counts34": [0,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0], "contract_version": "m0-v1"}, "expect_error": "UNAVAILABLE_BELOW_HAND"}
+    ,{"name":"meld_count_out_of_range","operation":"calculate_shanten34","input":{"variant":"yonma","counts34":[],"meld_count":5,"unavailable_counts34":[],"contract_version":"m0-v1"},"expect_error":"MELD_COUNT_OUT_OF_RANGE"}
+    ,{"name":"hand_meld_inconsistent","operation":"analyze_draws34","input":{"variant":"yonma","counts34":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"meld_count":0,"unavailable_counts34":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"contract_version":"m0-v1"},"expect_error":"HAND_MELD_INCONSISTENT"}
   ]
 }
