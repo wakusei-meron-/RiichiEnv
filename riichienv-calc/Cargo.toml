@@ -1,0 +1,20 @@
+[package]
+name = "riichienv-calc"
+version = "0.1.0"
+edition = "2024"
+license = "Apache-2.0"
+description = "Strict, deterministic four-player Riichi Mahjong calculation core"
+repository = "https://github.com/wakusei-meron-/RiichiEnv"
+keywords = ["mahjong", "riichi", "shanten", "ukeire"]
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+thiserror = "2.0"
+
+[build-dependencies]
+
+[dev-dependencies]
+serde_json = "1.0"
+
+[features]
+legacy-python = []

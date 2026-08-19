@@ -12,7 +12,7 @@ resolution-markers = [
 
 [manifest]
 members = [
-    "riichienv",
+    "mj-riichienv",
     "riichienv-ml",
 ]
 
@@ -1355,6 +1355,43 @@ wheels = [
 ]
 
 [[package]]
+name = "mj-riichienv"
+version = "0.1.0"
+source = { editable = "." }
+dependencies = [
+    { name = "ipython" },
+    { name = "pyyaml" },
+]
+
+[package.dev-dependencies]
+debug = [
+    { name = "jupyterlab" },
+]
+dev = [
+    { name = "maturin" },
+    { name = "pre-commit" },
+    { name = "pytest" },
+    { name = "ruff" },
+    { name = "ty" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "ipython" },
+    { name = "pyyaml", specifier = ">=6.0.3" },
+]
+
+[package.metadata.requires-dev]
+debug = [{ name = "jupyterlab" }]
+dev = [
+    { name = "maturin", specifier = ">=1.9.4,<2.0" },
+    { name = "pre-commit", specifier = ">=4.5.1" },
+    { name = "pytest", specifier = ">=9.0" },
+    { name = "ruff", specifier = ">=0.8.0" },
+    { name = "ty", specifier = ">=0.0.7" },
+]
+
+[[package]]
 name = "mpmath"
 version = "1.3.0"
 source = { registry = "https://pypi.org/simple" }
@@ -2623,55 +2660,18 @@ wheels = [
 ]
 
 [[package]]
-name = "riichienv"
-version = "0.4.8"
-source = { editable = "." }
-dependencies = [
-    { name = "ipython" },
-    { name = "pyyaml" },
-]
-
-[package.dev-dependencies]
-debug = [
-    { name = "jupyterlab" },
-]
-dev = [
-    { name = "maturin" },
-    { name = "pre-commit" },
-    { name = "pytest" },
-    { name = "ruff" },
-    { name = "ty" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "ipython" },
-    { name = "pyyaml", specifier = ">=6.0.3" },
-]
-
-[package.metadata.requires-dev]
-debug = [{ name = "jupyterlab" }]
-dev = [
-    { name = "maturin", specifier = ">=1.9.4,<2.0" },
-    { name = "pre-commit", specifier = ">=4.5.1" },
-    { name = "pytest", specifier = ">=9.0" },
-    { name = "ruff", specifier = ">=0.8.0" },
-    { name = "ty", specifier = ">=0.0.7" },
-]
-
-[[package]]
 name = "riichienv-ml"
 version = "0.4.8"
 source = { editable = "riichienv-ml" }
 dependencies = [
     { name = "dotenv" },
     { name = "loguru" },
+    { name = "mj-riichienv" },
     { name = "numpy" },
     { name = "polars" },
     { name = "pydantic" },
     { name = "pyyaml" },
     { name = "ray", extra = ["default"] },
-    { name = "riichienv" },
     { name = "tensordict" },
     { name = "torch" },
     { name = "torchrl" },
@@ -2683,12 +2683,12 @@ dependencies = [
 requires-dist = [
     { name = "dotenv", specifier = ">=0.9.9" },
     { name = "loguru", specifier = ">=0.7.3" },
+    { name = "mj-riichienv", editable = "." },
     { name = "numpy", specifier = ">=2.4.1" },
     { name = "polars", specifier = ">=1.37.1" },
     { name = "pydantic", specifier = ">=2.0.0" },
     { name = "pyyaml", specifier = ">=6.0" },
     { name = "ray", extras = ["default"], specifier = ">=2.9.0" },
-    { name = "riichienv", editable = "." },
     { name = "tensordict", specifier = ">=0.3.0" },
     { name = "torch", specifier = ">=2.9.1" },
     { name = "torchrl", specifier = ">=0.3.0" },

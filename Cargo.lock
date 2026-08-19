@@ -736,6 +736,28 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dc897dd8d9e8bd1ed8cdad82b5966c3e0ecae09fb1907d58efaa013543185d0a"
 
 [[package]]
+name = "riichienv-calc"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
+name = "riichienv-calc-wasm"
+version = "0.1.0"
+dependencies = [
+ "getrandom",
+ "js-sys",
+ "riichienv-calc",
+ "serde",
+ "serde-wasm-bindgen",
+ "serde_json",
+ "wasm-bindgen",
+]
+
+[[package]]
 name = "riichienv-core"
 version = "0.4.8"
 dependencies = [
@@ -747,6 +769,7 @@ dependencies = [
  "ndarray",
  "pyo3",
  "rand",
+ "riichienv-calc",
  "serde",
  "serde_json",
  "sha2",
@@ -758,7 +781,9 @@ name = "riichienv-python"
 version = "0.4.8"
 dependencies = [
  "pyo3",
+ "riichienv-calc",
  "riichienv-core",
+ "serde",
  "serde_json",
 ]
 
